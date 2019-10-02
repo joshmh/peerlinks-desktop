@@ -13,7 +13,7 @@ import * as bs58 from 'bs58';
 const INVITE_TIMEOUT = 15 * 60 * 1000; // 15 minutes
 
 export default class Network {
-  constructor(ipc, options = {}) {
+  constructor (ipc, options = {}) {
     this.ipc = ipc;
     this.options = options;
     if (!this.options.db) {
@@ -46,7 +46,7 @@ export default class Network {
     this.initIPC();
   }
 
-  async init() {
+  async init () {
     this.storage = new SqliteStorage({ file: this.options.db });
     await this.storage.open();
 
@@ -62,7 +62,7 @@ export default class Network {
     this.isReady = true;
   }
 
-  initIPC() {
+  initIPC () {
     const ipc = this.ipc;
 
     const handle = (type, handler, requireReady = true) => {
@@ -79,8 +79,10 @@ export default class Network {
           event.reply('response', { seq, payload: result });
         }).catch((err) => {
           log.info(`network: error to "${type}" seq=${seq}`);
-          event.reply('response',
-            { seq, error: err.message, stack: err.stack });
+          event.reply(
+            'response',
+            { seq, error: err.message, stack: err.stack }
+          );
         });
       });
     };
@@ -154,8 +156,7 @@ export default class Network {
       }
 
       log.info(`creating channel from public key=${publicKey.toString('hex')}`);
-      const channel = await this.peerLinks.feedFromPublicKey(
-        publicKey, { name });
+      const channel = await this.peerLinks.feedFromPublicKey(publicKey, { name });
 
       this.swarm.joinChannel(channel);
       await this.updateBadge();
@@ -252,8 +253,7 @@ export default class Network {
 
       // Otherwise - wait
       log.info(`network: waitForIncomingMessage ${channelId} ... wait`);
-      const entry = this.waitList.waitFor(
-        'update:' + channelId.toString('hex'), timeout);
+      const entry = this.waitList.waitFor('update:' + channelId.toString('hex'), timeout);
       const isAlive = await entry;
       this.updatedChannels.delete(channel);
       return isAlive;
@@ -510,7 +510,7 @@ export default class Network {
     });
   }
 
-  async runUpdateLoop(channel, timeout) {
+  async runUpdateLoop (channel, timeout) {
     // Channel removed
     if (!this.peerLinks.channels.includes(channel)) {
       return;
@@ -542,7 +542,7 @@ export default class Network {
     return await this.runUpdateLoop(channel, timeout);
   }
 
-  async runChainLoop() {
+  async runChainLoop () {
     for (;;) {
       try {
         if (!await this.peerLinks.waitForChainMapUpdate()) {
@@ -558,7 +558,7 @@ export default class Network {
     }
   }
 
-  serializeIdentity(identity) {
+  serializeIdentity (identity) {
     return {
       name: identity.name,
       publicKey: identity.publicKey.toString('hex'),
@@ -568,7 +568,7 @@ export default class Network {
     };
   }
 
-  async serializeChannel(channel) {
+  async serializeChannel (channel) {
     const [ last ] =  await channel.getReverseMessagesAtOffset(0);
     return {
       id: channel.id.toString('hex'),
@@ -584,7 +584,7 @@ export default class Network {
     };
   }
 
-  serializeMessage(message) {
+  serializeMessage (message) {
     const author = message.getAuthor();
 
     return {
@@ -600,7 +600,7 @@ export default class Network {
     };
   }
 
-  async updateBadge() {
+  async updateBadge () {
     let unread = 0;
     for (const channel of this.peerLinks.channels) {
       const messageCount = await channel.getMessageCount();
@@ -612,7 +612,7 @@ export default class Network {
     this.options.setBadgeCount(unread);
   }
 
-  async close() {
+  async close () {
     if (this.peerLinks) {
       await this.peerLinks.close();
     }

@@ -28,7 +28,8 @@ const USER_DATA_DIR = app.getPath('userData');
 const DB_FILE = path.join(
   USER_DATA_DIR,
   isDev ? (process.env.PEERLINKS_DB || 'db-dev.sqlite') :
-    'db-v2.sqlite');
+    'db-v2.sqlite'
+);
 
 // Create `userData` folder if it doesn't exist
 if (!fs.existsSync(USER_DATA_DIR)) {
@@ -65,7 +66,7 @@ log.info(`database file=${DB_FILE}`);
 const network = new Network(ipc, {
   db: DB_FILE,
 
-  setBadgeCount(count) {
+  setBadgeCount (count) {
     app.setBadgeCount(count);
   },
 });
@@ -84,7 +85,7 @@ network.init().then(() => {
 let windowState = null;
 let window = null;
 
-function createWindow() {
+function createWindow () {
   if (window !== null) {
     return;
   }
@@ -141,7 +142,7 @@ app.on('ready', () => {
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
 
-  function checkForUpdates() {
+  function checkForUpdates () {
     autoUpdater.checkForUpdatesAndNotify().catch(() => {
       // Ignore
     });
